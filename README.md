@@ -1,0 +1,7 @@
+# Smart Mirror
+
+## Installation
+...
+
+## Usage
+...

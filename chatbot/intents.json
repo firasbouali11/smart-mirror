@@ -1,0 +1,150 @@
+{
+    "intents": [
+      {
+        "tag": "greeting",
+        "patterns": [
+          "Hi",
+          "Hey",
+          "How are you",
+          "Is anyone there?",
+          "Hello",
+          "Good day"
+        ],
+        "responses": [
+          "Hello, thanks for visiting",
+          "Hi there, what can I do for you?",
+          "Hi there, how can I help?"
+        ]
+      },
+      {
+        "tag": "goodbye",
+        "patterns": ["Bye", "See you later", "Goodbye"],
+        "responses": [
+          "See you later, thanks for visiting",
+          "Have a nice day",
+          "Bye! Come back again soon."
+        ]
+      },
+      {
+        "tag": "thanks",
+        "patterns": ["Thanks", "Thank you", "That's helpful", "Thank's a lot!"],
+        "responses": ["Happy to help!", "Any time!", "My pleasure"]
+      },
+      {
+        "tag": "funny",
+        "patterns": [
+          "Tell me a joke!",
+          "Tell me something funny!",
+          "Do you know a joke?"
+        ],
+        "responses": [
+          "Why did the hipster burn his mouth? He drank the coffee before it was cool.",
+          "What did the buffalo say when his son left for college? Bison."
+        ]
+      },
+      {
+        "tag": "tasks",
+        "patterns": [
+          "What are mmy tasks?",
+          "What do i have to do today?",
+          "List of tasks",
+          "my task",
+          "to do list",
+          "show me my tasks"
+        ],
+        "responses": [
+          "Displaying your tasks right away !."
+        ]
+      },
+      {
+        "tag": "calendar",
+        "patterns": [
+          "what day is it?",
+          "show me the calendar",
+          "days of the week",
+          "this month",
+          "what's the date"
+        ],
+        "responses": [
+          "Displaying the calendar right away !."
+        ]
+      },
+      {
+        "tag": "color",
+        "patterns": [
+          "display my color",
+          "I'm feeling good color",
+          "happy color",
+          "sad color",
+          "lights on",
+          "put the LED on"
+          
+        ],
+        "responses": [
+          "LED activated."
+        ]
+      },
+      {
+        "tag": "weather",
+        "patterns": [
+          "is it rainy today?",
+          "show me the weather",
+          "is it hot?",
+          "sunny day",
+          "temperature today",
+          "snowing today",
+          "beach day"
+        ],
+        "responses": [
+          "Displaying the weather right away !."
+        ]
+      },
+      {
+        "tag": "music",
+        "patterns": [
+          "play me a song",
+          "play a music",
+          "go to my playlist",
+          "melody to my ears",
+          "sound on",
+          "turn up volume",
+          "drop me a beat",
+          "play an instrument"
+        ],
+        "responses": [
+          "Playing a song from your playlist!."
+        ]
+      },
+      {
+        "tag": "profile",
+        "patterns": [
+          "show me my profile",
+          "go to settings",
+          "upload picture",
+          "change my name",
+          "display settings",
+          "set up profile",
+          "configuration"
+        ],
+        "responses": [
+          "Displaying profile setting right away !."
+        ]
+      },
+      {
+        "tag": "email",
+        "patterns": [
+          "send an email",
+          "recieve an email",
+          "show me mail",
+          "send document",
+          "display my mails",
+          "write an email",
+          "show mailbox"
+        ],
+        "responses": [
+          "Checking your emails right away !."
+        ]
+      }
+    ]
+  }
+  
