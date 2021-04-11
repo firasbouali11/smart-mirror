@@ -3,3 +3,4 @@
 sudo apt update -y
 sudo apt install python3 python3-pip python3-pyaudio mpg321 -y
 python3 -m pip install -r requirements.txt
+mkdir -p ../classifier/db
