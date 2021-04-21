@@ -15,7 +15,7 @@ def servant(alexa):
         except:
             print("error")
         print(recon)
-        if "alexa" in recon.lower():
+        if alexa.name.lower() in recon.lower():
             tag, answer = alexa.response(recon)
             alexa.speak(answer)
             if tag == "music":

@@ -29,7 +29,7 @@ class Alexa:
         self.intents = readjson(getFullPath("chatbot/intents.json"))
         self.driver = None
         self.model = self.initModel()
-        self.name = "Alexa"
+        self.name = "Ava"
         self.users = requests.get("http://localhost:8000/tokens", headers={"Authorization":"token 2e2c9fc839b733f3817f8b0164b29590220d5622"}).json()
         print(self.users)
         self.user = ""
@@ -57,7 +57,7 @@ class Alexa:
             element = WebDriverWait(self.driver, 10).until(
                 EC.presence_of_element_located((By.ID, "search"))
             )
-            element.send_keys(music)
+            element.send_keys(music+" lyrics")
             element.send_keys(Keys.ENTER)
             element = WebDriverWait(self.driver, 10).until(
                 EC.presence_of_element_located((By.XPATH,
