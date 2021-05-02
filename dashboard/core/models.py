@@ -15,7 +15,7 @@ class Mirror(models.Model):
         return self.owner_name
 
 class ProfileManager(BaseUserManager):
-    def create_user(self, username, email, image,mirror,password=None):
+    def create_user(self, username, email, image,mirror=None,password=None):
         if not email or not username:
             raise ValueError("missing values !")
 
@@ -31,7 +31,7 @@ class ProfileManager(BaseUserManager):
         return user
 
     def create_superuser(self, username, password, email,image=None,mirror=None):
-        superuser = self.create_user(username, email,image, password)
+        superuser = self.create_user(username, email,image,mirror, password)
         superuser.is_staff = True
         superuser.is_admin = True
         superuser.is_superuser = True
@@ -62,6 +62,7 @@ class Profile(AbstractBaseUser):
 
     def has_module_perms(self, app_label):
         return True
+
 
 
 class Task(models.Model):
