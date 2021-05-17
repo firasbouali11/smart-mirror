@@ -5,6 +5,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from rest_framework.authtoken.models import Token
 
+
 # Create your models here.
 
 
@@ -15,7 +16,7 @@ class Mirror(models.Model):
         return self.owner_name
 
 class ProfileManager(BaseUserManager):
-    def create_user(self, username, email, image,mirror=None,password=None):
+    def create_user(self, username, email, image, mirror=None, password=None):
         if not email or not username:
             raise ValueError("missing values !")
 
@@ -23,15 +24,15 @@ class ProfileManager(BaseUserManager):
             username=username,
             email=self.normalize_email(email),
             image=image,
-            mirror=mirror
+            mirror=mirror,
         )
         user.set_password(password)
         user.save(using=self._db)
 
         return user
 
-    def create_superuser(self, username, password, email,image=None,mirror=None):
-        superuser = self.create_user(username, email,image,mirror, password)
+    def create_superuser(self, username, password, email, image=None,  mirror=None):
+        superuser = self.create_user(username, email, image, mirror, password)
         superuser.is_staff = True
         superuser.is_admin = True
         superuser.is_superuser = True
@@ -41,10 +42,10 @@ class ProfileManager(BaseUserManager):
 
 
 class Profile(AbstractBaseUser):
-    username = models.CharField(max_length=20,unique=True)
+    username = models.CharField(max_length=20, unique=True)
     email = models.EmailField(max_length=20, unique=True)
-    image = models.ImageField(upload_to="media",null=True)
-    mirror = models.ForeignKey(Mirror,on_delete=models.CASCADE,null=True)
+    image = models.ImageField(upload_to="media", null=True)
+    mirror = models.ForeignKey(Mirror, on_delete=models.CASCADE, null=True)
     date_joined = models.DateTimeField(auto_now=True)
     last_login = models.DateTimeField(auto_now_add=True)
     is_admin = models.BooleanField(default=False)
@@ -64,17 +65,30 @@ class Profile(AbstractBaseUser):
         return True
 
 
-
 class Task(models.Model):
     task = models.CharField(max_length=255)
     date = models.DateTimeField()
     created = models.DateTimeField(auto_now_add=True)
+    done = models.BooleanField(default=False,null=True)
     user = models.ForeignKey(Profile, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.user.username
 
+class Email(models.Model):
+    email = models.EmailField(max_length=45)
+    selected = models.BooleanField(default=False, null=True)
+    sender = models.ForeignKey(Profile,on_delete=models.CASCADE,related_name="sender")
 
+    def __str__(self):
+        return self.email
+
+class Music(models.Model):
+    music = models.CharField(max_length=45)
+    user = models.ForeignKey(Profile,on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.music
 
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)
 def create_auth_token(sender, instance=None, created=False, **kwargs):

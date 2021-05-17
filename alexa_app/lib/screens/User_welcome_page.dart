@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import "package:flutter/material.dart";
+import "package:alexa_app/services/Users.dart";
 
 class UserWelcomePage extends StatefulWidget {
   @override
@@ -8,9 +9,11 @@ class UserWelcomePage extends StatefulWidget {
 
 class _UserWelcomePageState extends State<UserWelcomePage> {
   bool ledoff = false;
+  CurrentUser user;
 
   @override
   Widget build(BuildContext context) {
+    user = ModalRoute.of(context).settings.arguments;
     return Scaffold(
       body: SafeArea(
         child: Container(
@@ -24,14 +27,14 @@ class _UserWelcomePageState extends State<UserWelcomePage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               CircleAvatar(
-                backgroundImage: AssetImage("assets/images/woman.jpg"),
+                backgroundImage: NetworkImage(user.image),
                 radius: 80,
               ),
               SizedBox(
                 height: 50,
               ),
               Text(
-                "Firas Bouali",
+                user.username,
                 style: TextStyle(
                     fontSize: 45, letterSpacing: 1.2, color: Colors.white),
               ),
@@ -47,8 +50,43 @@ class _UserWelcomePageState extends State<UserWelcomePage> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
+                        GestureDetector(
+                          onTap: (){
+                            Navigator.pushNamed(context, "/playlist",arguments: user);
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Container(
+                              width: 130,
+                              height: 130,
+                              decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  boxShadow: [
+                                    BoxShadow(
+                                        color: Colors.white,
+                                        offset: Offset(0, 2),
+                                        blurRadius: 1.8)
+                                  ],
+                                  borderRadius: BorderRadius.circular(12)),
+                              child: Column(
+                                children: [
+                                  Icon(
+                                    Icons.music_note,
+                                    size: 90,
+                                  ),
+                                  Text(
+                                    "Music",
+                                    style: TextStyle(fontSize: 25),
+                                  )
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: (){
+                            Navigator.pushNamed(context, "/schedule",arguments: user);
+                          },
                           child: Container(
                             width: 130,
                             height: 130,
@@ -64,40 +102,15 @@ class _UserWelcomePageState extends State<UserWelcomePage> {
                             child: Column(
                               children: [
                                 Icon(
-                                  Icons.music_note,
+                                  Icons.menu_open,
                                   size: 90,
                                 ),
                                 Text(
-                                  "Music",
+                                  "Tasks",
                                   style: TextStyle(fontSize: 25),
                                 )
                               ],
                             ),
-                          ),
-                        ),
-                        Container(
-                          width: 130,
-                          height: 130,
-                          decoration: BoxDecoration(
-                              color: Colors.white,
-                              boxShadow: [
-                                BoxShadow(
-                                    color: Colors.white,
-                                    offset: Offset(0, 2),
-                                    blurRadius: 1.8)
-                              ],
-                              borderRadius: BorderRadius.circular(12)),
-                          child: Column(
-                            children: [
-                              Icon(
-                                Icons.menu_open,
-                                size: 90,
-                              ),
-                              Text(
-                                "Tasks",
-                                style: TextStyle(fontSize: 25),
-                              )
-                            ],
                           ),
                         ),
                       ],
@@ -142,29 +155,34 @@ class _UserWelcomePageState extends State<UserWelcomePage> {
                             ),
                           ),
                         ),
-                        Container(
-                          width: 130,
-                          height: 130,
-                          decoration: BoxDecoration(
-                              color: Colors.white,
-                              boxShadow: [
-                                BoxShadow(
-                                    color: Colors.white,
-                                    offset: Offset(0, 2),
-                                    blurRadius: 1.8)
+                        GestureDetector(
+                          onTap: (){
+                            Navigator.pushNamed(context, "/mails",arguments: user);
+                          },
+                          child: Container(
+                            width: 130,
+                            height: 130,
+                            decoration: BoxDecoration(
+                                color: Colors.white,
+                                boxShadow: [
+                                  BoxShadow(
+                                      color: Colors.white,
+                                      offset: Offset(0, 2),
+                                      blurRadius: 1.8)
+                                ],
+                                borderRadius: BorderRadius.circular(12)),
+                            child: Column(
+                              children: [
+                                Icon(
+                                  Icons.mail,
+                                  size: 90,
+                                ),
+                                Text(
+                                  "Mail",
+                                  style: TextStyle(fontSize: 25),
+                                )
                               ],
-                              borderRadius: BorderRadius.circular(12)),
-                          child: Column(
-                            children: [
-                              Icon(
-                                Icons.mail,
-                                size: 90,
-                              ),
-                              Text(
-                                "Mail",
-                                style: TextStyle(fontSize: 25),
-                              )
-                            ],
+                            ),
                           ),
                         ),
                       ],

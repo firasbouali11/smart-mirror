@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import Profile,Task
+from .models import Profile,Task,Mirror,Email
 
 
 # Register your models here
@@ -16,3 +16,5 @@ class AccountAdmin(UserAdmin):
 
 admin.site.register(Profile, AccountAdmin)
 admin.site.register(Task)
+admin.site.register(Email)
+admin.site.register(Mirror)

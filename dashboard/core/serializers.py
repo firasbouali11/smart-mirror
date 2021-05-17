@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Profile, Task, Mirror
+from .models import Profile, Task, Mirror, Email,Music
 from rest_framework.authtoken.models import Token
 from django.contrib.auth import authenticate
 from django.utils.translation import gettext_lazy as _
@@ -8,7 +8,7 @@ from django.utils.translation import gettext_lazy as _
 class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
-        fields = ["id", "username", "email","image"]
+        fields = ["id", "username", "email", "image"]
 
 
 class TaskSerializer(serializers.ModelSerializer):
@@ -16,16 +16,31 @@ class TaskSerializer(serializers.ModelSerializer):
         model = Task
         fields = "__all__"
 
+
 class TokenSerializer(serializers.ModelSerializer):
     user = ProfileSerializer(read_only=True)
+
     class Meta:
         model = Token
-        fields = ["key","user"]
+        fields = ["key", "user"]
+
 
 class MirrorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Mirror
         fields = "__all__"
+
+
+class EmailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Email
+        fields = ["id","email","selected"]
+
+class MusicSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Music
+        fields = ["id","music"]
+
 
 class AuthTokenSerializer(serializers.Serializer):
     username = serializers.CharField(
@@ -66,4 +81,3 @@ class AuthTokenSerializer(serializers.Serializer):
 
         attrs['user'] = user
         return attrs
-

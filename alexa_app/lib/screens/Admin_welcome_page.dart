@@ -2,31 +2,31 @@ import "package:flutter/material.dart";
 import "package:alexa_app/services/Users.dart";
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
+import 'package:localstorage/localstorage.dart';
 
 class Admin_welcome_page extends StatefulWidget {
   @override
   _Admin_welcome_pageState createState() => _Admin_welcome_pageState();
 }
 
+Admin admin;
+LocalStorage storage = LocalStorage("ava");
+
 class _Admin_welcome_pageState extends State<Admin_welcome_page> {
 
-  List<User> users = [
-    User(name: "firas", password: "ezjfhkjzefhze", image: "lfjzklfjezkl"),
-    User(name: "firas", password: "ezjfhkjzefhze", image: "lfjzklfjezkl"),
-    User(name: "firas", password: "ezjfhkjzefhze", image: "lfjzklfjezkl"),
-    User(name: "firas", password: "ezjfhkjzefhze", image: "lfjzklfjezkl"),
-    User(name: "firas", password: "ezjfhkjzefhze", image: "lfjzklfjezkl"),
-    User(name: "firas", password: "ezjfhkjzefhze", image: "lfjzklfjezkl"),
-    User(name: "firas", password: "ezjfhkjzefhze", image: "lfjzklfjezkl"),
-    User(name: "firas", password: "ezjfhkjzefhze", image: "lfjzklfjezkl"),
-    User(name: "firas", password: "ezjfhkjzefhze", image: "lfjzklfjezkl"),
-    User(name: "firas", password: "ezjfhkjzefhze", image: "lfjzklfjezkl"),
-    User(name: "firas", password: "ezjfhkjzefhze", image: "lfjzklfjezkl"),
-  ];
+  List users=[];
+
+  delete_user(){
+    setState(() {
+    });
+  }
+
 
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
+    admin = ModalRoute.of(context).settings.arguments;
+    users = admin.users;
     return Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: Color(0xffC4C4C4),
@@ -34,6 +34,13 @@ class _Admin_welcome_pageState extends State<Admin_welcome_page> {
         title: Text("Admin"),
         centerTitle: true,
         backgroundColor: Color(0xff760F83),
+      ),
+      floatingActionButton: FloatingActionButton(
+        child: Icon(Icons.person_add_alt,color: Colors.black,),
+        backgroundColor: Colors.white,
+        onPressed: (){
+          Navigator.pushNamed(context, "/adduser",arguments: admin);
+        },
       ),
       body: SafeArea(
         child: Stack(
@@ -44,8 +51,8 @@ class _Admin_welcome_pageState extends State<Admin_welcome_page> {
               shrinkWrap: true,
               itemCount: users.length,
               itemBuilder: (context, index) {
-                User instance = users[index];
-                return CardWidget(user:instance);
+                // User instance = users[index];
+                return CardWidget(user:users[index],callback: delete_user,);
               },
             ),
             Padding(
@@ -81,13 +88,28 @@ class _Admin_welcome_pageState extends State<Admin_welcome_page> {
   }
 }
 
-class CardWidget extends StatelessWidget {
+class CardWidget extends StatefulWidget {
 
-  final User user;
-  CardWidget({this.user});
+  final Map<String,dynamic> user;
+  void Function() callback;
+  CardWidget({this.user,this.callback});
+
+
+  @override
+  _CardWidgetState createState() => _CardWidgetState();
+}
+
+class _CardWidgetState extends State<CardWidget> {
+
 
   @override
   Widget build(BuildContext context) {
+    delete_user(int id) async{
+      await admin.delete_user(id.toString(), storage);
+      await admin.get_users(storage);
+      widget.callback();
+    }
+
     return Card(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20.0),
@@ -103,19 +125,20 @@ class CardWidget extends StatelessWidget {
               child: Row(
                 children: [
                   CircleAvatar(
-                    child: Text(user.name.substring(0,1)),
+                    backgroundImage: widget.user["image"]==null ? null: NetworkImage(widget.user["image"])   ,
+                    child: widget.user["image"]==null ? Text(widget.user["username"]) : null,
                     backgroundColor: Colors.black,
                   ),
                   Padding(
                     padding: const EdgeInsets.only(left:8.0),
-                    child: Text(user.name),
+                    child: Text(widget.user["username"]),
                   ),
                 ],
               ),
             ),
             GestureDetector(
               child: Icon(Icons.delete,size: 40,),
-              onTap: (){print("deleted");},
+              onTap: (){delete_user(widget.user["id"]);},
             )
           ],
         ),

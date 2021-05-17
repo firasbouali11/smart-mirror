@@ -21,6 +21,8 @@ import smtplib
 EMAIL = "santal.project10@gmail.com"
 PASSWORD  = "santal123456"
 
+deepface_model = DeepFace.build_model("VGG-Face")
+
 class Alexa:
     def __init__(self):
         self.cap = cv2.VideoCapture(0)
@@ -148,7 +150,7 @@ class Alexa:
 
     def reconImage(self,frame):
         try:
-            a = DeepFace.find(frame, db_path=getFullPath("classifier/db"))
+            a = DeepFace.find(frame, db_path=getFullPath("classifier/db"),model=deepface_model)
             emotion = DeepFace.analyze(frame, actions=["emotion"])
         except:
             return None, None
@@ -156,6 +158,8 @@ class Alexa:
 
     def camera(self):
         i = 1
+
+        print("done")
         while True:
             ret, frame = self.cap.read()
             # rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
@@ -164,21 +168,21 @@ class Alexa:
             for x, y, w, h in faces:
                 cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 0, 0), 2)
             try:
-                cv2.putText(frame, self.user, (100, 100), cv2.FONT_HERSHEY_COMPLEX, 1, (255, 0, 0), 2)
-                cv2.putText(frame, self.emotion, (100, 150), cv2.FONT_HERSHEY_COMPLEX, 1, (255, 0, 0), 2)
+                cv2.putText(frame, self.user, (x, y-70), cv2.FONT_HERSHEY_COMPLEX, 1, (255, 0, 0), 2)
+                cv2.putText(frame, self.emotion, (x, y-20), cv2.FONT_HERSHEY_COMPLEX, 1, (255, 0, 0), 2)
             except:
                 pass
             if i % 70 == 0:
                 if len(faces) != 0:
-                    a, emotion = self.reconImage(frame)
+                    a,emotion = self.reconImage(frame)
                     try:
                         self.user = a.identity[0].split("/")[-2]
                         self.emotion = emotion["dominant_emotion"]
-                        cv2.putText(frame, self.user, (100, 100), cv2.FONT_HERSHEY_COMPLEX, 1, (255, 0, 0), 2)
-                        cv2.putText(frame, self.emotion, (100, 250), cv2.FONT_HERSHEY_COMPLEX, 1, (255, 0, 0), 2)
+                        cv2.putText(frame, self.user, (x, y-70), cv2.FONT_HERSHEY_COMPLEX, 1, (255, 0, 0), 2)
+                        cv2.putText(frame, self.emotion, (x, y-20), cv2.FONT_HERSHEY_COMPLEX, 1, (255, 0, 0), 2)
                         i = 1
                     except:
-                        pass
+                        print("error identifying faces")
 
             i += 1
             cv2.imshow('frame', frame)
