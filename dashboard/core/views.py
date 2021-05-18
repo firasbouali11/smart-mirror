@@ -123,7 +123,7 @@ class TokenViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAdminUser]
 
     def create(self, request, *args, **kwargs):
-        return Response("l3asba", status=403)
+        return Response("You're not allowed", status=403)
 
 
 class MirrorViewSet(viewsets.ModelViewSet):
