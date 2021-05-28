@@ -17,9 +17,16 @@ import random
 from deepface import DeepFace
 import cv2
 import smtplib
+import socket
+import pickle
+import socket
+import struct
 
 EMAIL = "santal.project10@gmail.com"
 PASSWORD  = "santal123456"
+
+clientsocket=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+clientsocket.connect(('192.168.1.8',8089))
 
 deepface_model = DeepFace.build_model("VGG-Face")
 
@@ -32,7 +39,7 @@ class Alexa:
         self.driver = None
         self.model = self.initModel()
         self.name = "Ava"
-        self.users = requests.get("http://localhost:8000/tokens", headers={"Authorization":"token 2e2c9fc839b733f3817f8b0164b29590220d5622"}).json()
+        self.users = requests.get("http://192.168.1.8:8000/tokens", headers={"Authorization":"token 2e2c9fc839b733f3817f8b0164b29590220d5622"}).json()
         print(self.users)
         self.user = ""
         self.emotion = ""
@@ -157,38 +164,16 @@ class Alexa:
         return a, emotion
 
     def camera(self):
-        i = 1
-
-        print("done")
-        while True:
+        while True :
             ret, frame = self.cap.read()
-            # rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-            facecascade = cv2.CascadeClassifier(cv2.data.haarcascades + "haarcascade_frontalface_default.xml")
-            faces = facecascade.detectMultiScale(frame, 1.1, 4)
-            for x, y, w, h in faces:
-                cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 0, 0), 2)
-            try:
-                cv2.putText(frame, self.user, (x, y-70), cv2.FONT_HERSHEY_COMPLEX, 1, (255, 0, 0), 2)
-                cv2.putText(frame, self.emotion, (x, y-20), cv2.FONT_HERSHEY_COMPLEX, 1, (255, 0, 0), 2)
-            except:
-                pass
-            if i % 70 == 0:
-                if len(faces) != 0:
-                    a,emotion = self.reconImage(frame)
-                    try:
-                        self.user = a.identity[0].split("/")[-2]
-                        self.emotion = emotion["dominant_emotion"]
-                        cv2.putText(frame, self.user, (x, y-70), cv2.FONT_HERSHEY_COMPLEX, 1, (255, 0, 0), 2)
-                        cv2.putText(frame, self.emotion, (x, y-20), cv2.FONT_HERSHEY_COMPLEX, 1, (255, 0, 0), 2)
-                        i = 1
-                    except:
-                        print("error identifying faces")
+            # Serialize frame
+            data = pickle.dumps(frame)
 
-            i += 1
-            cv2.imshow('frame', frame)
+            # Send message length first
+            message_size = struct.pack("L", len(data))
 
-            if cv2.waitKey(1) & 0xFF == ord('q'):
-                break
+            # Then data
+            clientsocket.sendall(message_size + data)
 
     def cameraDone(self):
         self.cap.release()
