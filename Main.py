@@ -6,6 +6,10 @@ def seeme(alexa):
     alexa.camera()
     alexa.cameraDone()
 
+def collector(alexa):
+    alexa.identify()
+
+
 def servant(alexa):
     while 1:
         tag = ""
@@ -54,8 +58,10 @@ if __name__ == "__main__":
     alexa = Alexa()
     t1 = threading.Thread(target=seeme,args=(alexa,))
     t2 = threading.Thread(target=servant,args=(alexa,))
+    t3 = threading.Thread(target=collector,args=(alexa,))
     t1.start()
     t2.start()
+    t3.start()
 
 
 

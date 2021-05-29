@@ -3,31 +3,23 @@ import socket
 import struct
 from deepface import DeepFace
 import cv2
-import os
+from time import sleep
 
+deepface_model = DeepFace.build_model("VGG-Face")
 
-def getFullPath(filename):
-    basedir = os.path.dirname(__file__)
-    basedir = basedir.split("/")
-    basedir.pop(-1)
-    basedir = "/".join(basedir)
-    return os.path.join(basedir,filename)
-
-print(getFullPath("../classifier/db"))
 
 def reconImage(frame):
-    a,emotion = "",""
+    # a,emotion = "",""
     try:
-        a = DeepFace.find(frame, db_path=getFullPath("../classifier/db"))
+        a = DeepFace.find(frame, db_path="../classifier/db",model=deepface_model)
         emotion = DeepFace.analyze(frame, actions=["emotion"])
     except Exception as e:
         print(e)
     return a, emotion
 
 def camera(frame,i=1):
-    user = ""
-    emotion = ""
-    print("done")
+    global user
+    global emotion
     # rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
     facecascade = cv2.CascadeClassifier(cv2.data.haarcascades + "haarcascade_frontalface_default.xml")
     faces = facecascade.detectMultiScale(frame, 1.1, 4)
@@ -44,6 +36,7 @@ def camera(frame,i=1):
             try:
                 user = a.identity[0].split("/")[-2]
                 emotion = emotion["dominant_emotion"]
+                conn.send((user+"/"+emotion).encode("utf-8"))
                 cv2.putText(frame, user, (x, y-70), cv2.FONT_HERSHEY_COMPLEX, 1, (255, 0, 0), 2)
                 cv2.putText(frame, emotion, (x, y-20), cv2.FONT_HERSHEY_COMPLEX, 1, (255, 0, 0), 2)
                 print(user,emotion)
@@ -52,7 +45,7 @@ def camera(frame,i=1):
                 print("error identifying faces")
 
 
-HOST = '192.168.1.8'
+HOST = '192.168.1.7'
 PORT = 8089
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -69,11 +62,10 @@ data = b''
 payload_size = struct.calcsize("L")
 
 i = 1
-
 while True:
     # Retrieve message size
     while len(data) < payload_size:
-        data += conn.recv(4096)
+        data += conn.recv(4098)
 
     packed_msg_size = data[:payload_size]
     data = data[payload_size:]
@@ -81,7 +73,7 @@ while True:
 
     # Retrieve all data based on message size
     while len(data) < msg_size:
-        data += conn.recv(4096)
+        data += conn.recv(4098)
 
     frame_data = data[:msg_size]
     data = data[msg_size:]

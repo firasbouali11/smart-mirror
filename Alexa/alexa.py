@@ -14,10 +14,8 @@ from chatbot.model import NeuralNet
 import torch
 from chatbot.nltk_utils import bag_of_words, tokenize
 import random
-from deepface import DeepFace
 import cv2
 import smtplib
-import socket
 import pickle
 import socket
 import struct
@@ -26,20 +24,19 @@ EMAIL = "santal.project10@gmail.com"
 PASSWORD  = "santal123456"
 
 clientsocket=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-clientsocket.connect(('192.168.1.8',8089))
+clientsocket.connect(('192.168.1.7',8089))
 
-deepface_model = DeepFace.build_model("VGG-Face")
+cap = cv2.VideoCapture(0)
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+driver = None
 
 class Alexa:
     def __init__(self):
-        self.cap = cv2.VideoCapture(0)
-        self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         self.data = torch.load(getFullPath("chatbot/model.pth"), map_location=torch.device('cpu'))
         self.intents = readjson(getFullPath("chatbot/intents.json"))
-        self.driver = None
         self.model = self.initModel()
         self.name = "Ava"
-        self.users = requests.get("http://192.168.1.8:8000/tokens", headers={"Authorization":"token 2e2c9fc839b733f3817f8b0164b29590220d5622"}).json()
+        self.users = requests.get("http://192.168.1.7:8000/tokens", headers={"Authorization":"token b0adec18090c34468cdf18e2230b308fb5ad2d70"}).json()
         print(self.users)
         self.user = ""
         self.emotion = ""
@@ -51,7 +48,7 @@ class Alexa:
         hidden_size = self.data["hidden_size"]
         output_size = self.data["output_size"]
         model_state = self.data["model_state"]
-        model = NeuralNet(input_size, hidden_size, output_size).to(self.device)
+        model = NeuralNet(input_size, hidden_size, output_size).to(device)
         model.load_state_dict(model_state)
         model.eval()
 
@@ -60,15 +57,15 @@ class Alexa:
     def play_music(self, music):
         options = Options()
         options.add_argument("--remote-debugging-port=9222")
-        self.driver = webdriver.Chrome(getFullPath("Utils/chromedriver"), options=options)
-        self.driver.get("http://www.youtube.com")
+        driver = webdriver.Chrome(getFullPath("Utils/chromedriver"), options=options)
+        driver.get("http://www.youtube.com")
         try:
-            element = WebDriverWait(self.driver, 10).until(
+            element = WebDriverWait(driver, 10).until(
                 EC.presence_of_element_located((By.ID, "search"))
             )
             element.send_keys(music+" lyrics")
             element.send_keys(Keys.ENTER)
-            element = WebDriverWait(self.driver, 10).until(
+            element = WebDriverWait(driver, 10).until(
                 EC.presence_of_element_located((By.XPATH,
                                                 "/html/body/ytd-app/div/ytd-page-manager/ytd-search/div[1]/ytd-two-column-search-results-renderer/div/ytd-section-list-renderer/div[2]/ytd-item-section-renderer/div[3]/ytd-video-renderer[1]/div[1]/div/div[1]/div/h3"))
             )
@@ -79,10 +76,10 @@ class Alexa:
             #     sleep(1)
             sleep(30)
 
-            self.driver.close()
+            driver.close()
         except Exception as e:
             print(e)
-            self.driver.quit()
+            driver.quit()
 
     def speak(self, text):
         klem = gTTS(text)
@@ -139,7 +136,7 @@ class Alexa:
         sentence = tokenize(sentence)
         X = bag_of_words(sentence, self.data["all_words"])
         X = X.reshape(1, X.shape[0])
-        X = torch.from_numpy(X).to(self.device)
+        X = torch.from_numpy(X).to(device)
 
         output = self.model(X)
         _, predicted = torch.max(output, dim=1)
@@ -155,17 +152,9 @@ class Alexa:
         else:
             return "none","I do not understand..."
 
-    def reconImage(self,frame):
-        try:
-            a = DeepFace.find(frame, db_path=getFullPath("classifier/db"),model=deepface_model)
-            emotion = DeepFace.analyze(frame, actions=["emotion"])
-        except:
-            return None, None
-        return a, emotion
-
     def camera(self):
         while True :
-            ret, frame = self.cap.read()
+            ret, frame = cap.read()
             # Serialize frame
             data = pickle.dumps(frame)
 
@@ -173,11 +162,23 @@ class Alexa:
             message_size = struct.pack("L", len(data))
 
             # Then data
-            clientsocket.sendall(message_size + data)
+            clientsocket.send(message_size + data)
 
     def cameraDone(self):
-        self.cap.release()
+        cap.release()
         cv2.destroyAllWindows()
+
+    def identify(self):
+        while True:
+            user = clientsocket.recv(2048)
+            if not user:
+                print("no user !")
+                break
+            user, emotion = user.decode("utf-8").split("/")
+            if user != self.user:
+                self.user = user
+                self.speak(f"hey {self.user}")
+            print("user : "+self.user+" || "+self.emotion)
 
     def sendEmail(self,reciever="firas.bouali11@gmail.com",message="hello world"):
         server = smtplib.SMTP("smtp.gmail.com",587)
