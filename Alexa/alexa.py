@@ -19,17 +19,18 @@ import smtplib
 import pickle
 import socket
 import struct
+import sys
 
 EMAIL = "santal.project10@gmail.com"
 PASSWORD  = "santal123456"
 
 #host = (([ip for ip in socket.gethostbyname_ex(socket.gethostname())[2] if not ip.startswith("127.")] or [[(s.connect(("8.8.8.8", 53)), s.getsockname()[0], s.close()) for s in [socket.socket(socket.AF_INET, socket.SOCK_DGRAM)]][0][1]]) + ["no IP found"])[0]
 
-host = input("enter the server ip address: ")
+host = sys.argv[1]
 ENDPOINT = f"http://{host}:8000/"
 print(ENDPOINT)
 clientsocket=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-clientsocket.connect((host,8089))
+clientsocket.connect((host,9999))
 
 cap = cv2.VideoCapture(0)
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -167,7 +168,7 @@ class Alexa:
             message_size = struct.pack("L", len(data))
 
             # Then data
-            clientsocket.send(message_size + data)
+            clientsocket.send(message_size+data)
 
     def cameraDone(self):
         cap.release()
