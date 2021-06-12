@@ -3,13 +3,11 @@ import socket
 import struct
 from deepface import DeepFace
 import cv2
-from time import sleep
-
 deepface_model = DeepFace.build_model("VGG-Face")
 
 
 def reconImage(frame):
-    # a,emotion = "",""
+    a,emotion = "",""
     try:
         a = DeepFace.find(frame, db_path="../classifier/db",model=deepface_model)
         emotion = DeepFace.analyze(frame, actions=["emotion"])
@@ -44,8 +42,14 @@ def camera(frame,i=1):
             except:
                 print("error identifying faces")
 
+import pickle
+import socket
+import struct
+from deepface import DeepFace
+import cv2
 
 HOST = '192.168.1.7'
+HOST = (([ip for ip in socket.gethostbyname_ex(socket.gethostname())[2] if not ip.startswith("127.")] or [[(s.connect(("8.8.8.8", 53)), s.getsockname()[0], s.close()) for s in [socket.socket(socket.AF_INET, socket.SOCK_DGRAM)]][0][1]]) + ["no IP found"])[0]
 PORT = 8089
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

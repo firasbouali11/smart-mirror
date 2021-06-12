@@ -24,6 +24,7 @@ def servant(alexa):
             alexa.speak(answer)
             if tag == "music":
                 music = alexa.recon()
+                alexa.speak("what's the title of the song ?")
                 alexa.play_music(music)
             elif tag=="email":
                 alexa.speak("who is the receiver ?")

@@ -31,6 +31,7 @@ dependencies:
   image_picker: ^0.7.4
   http: ^0.13.2
   localstorage: ^4.0.0+1
+  flutter_launcher_icons: ^0.7.2
 
 dev_dependencies:
   flutter_test:
@@ -39,6 +40,10 @@ dev_dependencies:
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 
+flutter-icons:
+  android: true
+  ios: true
+  image_path: "assets/images/ava.ico"
 # The following section is specific to Flutter.
 flutter:
 
@@ -46,6 +51,8 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
+
+
 
   # To add assets to your application, add an assets section, like this:
   assets:

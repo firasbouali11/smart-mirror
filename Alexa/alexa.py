@@ -23,8 +23,12 @@ import struct
 EMAIL = "santal.project10@gmail.com"
 PASSWORD  = "santal123456"
 
+host = (([ip for ip in socket.gethostbyname_ex(socket.gethostname())[2] if not ip.startswith("127.")] or [[(s.connect(("8.8.8.8", 53)), s.getsockname()[0], s.close()) for s in [socket.socket(socket.AF_INET, socket.SOCK_DGRAM)]][0][1]]) + ["no IP found"])[0]
+
+ENDPOINT = f"http://{host}:8000/"
+print(ENDPOINT)
 clientsocket=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-clientsocket.connect(('192.168.1.7',8089))
+clientsocket.connect((host,8089))
 
 cap = cv2.VideoCapture(0)
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -36,7 +40,7 @@ class Alexa:
         self.intents = readjson(getFullPath("chatbot/intents.json"))
         self.model = self.initModel()
         self.name = "Ava"
-        self.users = requests.get("http://192.168.1.7:8000/tokens", headers={"Authorization":"token b0adec18090c34468cdf18e2230b308fb5ad2d70"}).json()
+        self.users = requests.get(f"{ENDPOINT}tokens", headers={"Authorization":"token b0adec18090c34468cdf18e2230b308fb5ad2d70"}).json()
         print(self.users)
         self.user = ""
         self.emotion = ""
@@ -115,7 +119,7 @@ class Alexa:
             "task": taskname,
             "date": date
         }
-        resp = requests.post("http://localhost:8000/tasks/", d, headers=headers)
+        resp = requests.post(f"{ENDPOINT}tasks/", d, headers=headers)
         print(resp.json())
 
     def showtasks(self, u):
@@ -126,7 +130,7 @@ class Alexa:
                 break
 
         headers = {"authorization": f"Token {token}"}
-        text = requests.get("http://localhost:8000/tasks", headers=headers)
+        text = requests.get(f"{ENDPOINT}tasks", headers=headers)
         text = text.json()
         for task in text:
             print("=" * 50)
@@ -170,13 +174,14 @@ class Alexa:
 
     def identify(self):
         while True:
-            user = clientsocket.recv(2048)
+            user = clientsocket.recv(4096)
             if not user:
                 print("no user !")
                 break
             user, emotion = user.decode("utf-8").split("/")
             if user != self.user:
                 self.user = user
+                self.emotion = emotion
                 self.speak(f"hey {self.user}")
             print("user : "+self.user+" || "+self.emotion)
 
