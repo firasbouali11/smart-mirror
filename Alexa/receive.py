@@ -28,8 +28,8 @@ def camera(frame,i=1):
     for x, y, w, h in faces:
         cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 0, 0), 2)
     try:
-        cv2.putText(frame, user, (x, y-70), cv2.FONT_HERSHEY_COMPLEX, 1, (255, 0, 0), 2)
-        cv2.putText(frame, emotion, (x, y-20), cv2.FONT_HERSHEY_COMPLEX, 1, (255, 0, 0), 2)
+        cv2.putText(frame, user, (x, y-40), cv2.FONT_HERSHEY_COMPLEX, 0.5, (255, 0, 0), 2)
+        cv2.putText(frame, emotion, (x, y-20), cv2.FONT_HERSHEY_COMPLEX, 0.5, (255, 0, 0), 2)
     except:
         pass
     if i % 70 == 0:
@@ -62,25 +62,25 @@ print('Socket now listening')
 conn, addr = s.accept()
 
 data = b''
-payload_size = struct.calcsize("L")
+payload_size = struct.calcsize("<L")
 print("done")
 i = 1
 
 while True:
     while len(data) < payload_size:
-        data += conn.recv(1024)
+        data += conn.recv(512)
     packed_msg_size = data[:payload_size]
 
     data = data[payload_size:]
-    msg_size = struct.unpack("L", packed_msg_size)[0]
+    msg_size = struct.unpack("<L", packed_msg_size)[0]
 
     while len(data) < msg_size:
-        data += conn.recv(1024)
+        data += conn.recv(512)
     frame_data = data[:msg_size]
     data = data[msg_size:]
 
     frame = pickle.loads(frame_data)
-
+    camera(frame,i)
     i+=1
 
     cv2.imshow("frame", frame)

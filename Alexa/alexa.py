@@ -33,6 +33,8 @@ clientsocket=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
 clientsocket.connect((host,9999))
 
 cap = cv2.VideoCapture(0)
+cap.set(cv2.CAP_PROP_FRAME_WIDTH, 320)
+cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 200)
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 driver = None
 
@@ -161,13 +163,10 @@ class Alexa:
     def camera(self):
         while True :
             ret, frame = cap.read()
-            # Serialize frame
+
             data = pickle.dumps(frame)
+            message_size = struct.pack("<L", len(data))
 
-            # Send message length first
-            message_size = struct.pack("L", len(data))
-
-            # Then data
             clientsocket.send(message_size+data)
 
     def cameraDone(self):

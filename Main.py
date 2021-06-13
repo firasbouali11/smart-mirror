@@ -23,9 +23,14 @@ def servant(alexa):
             tag, answer = alexa.response(recon)
             alexa.speak(answer)
             if tag == "music":
-                music = alexa.recon()
-                alexa.speak("what's the title of the song ?")
-                alexa.play_music(music)
+                alexa.speak("do you want to choose a song or should i pick randomly from your playlist")
+                ans = alexa.recon()
+                if "randomly" in ans.lower() or "playlist" in ans.lower():
+                    pass
+                else:
+                    alexa.speak("ok what's the title of the song ?")
+                    music = alexa.recon()
+                    alexa.play_music(music)
             elif tag=="email":
                 alexa.speak("who is the receiver ?")
                 reciever = alexa.recon(duration=10)
