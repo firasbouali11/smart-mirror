@@ -183,7 +183,12 @@ class Alexa:
             if user != self.user:
                 self.user = user
                 self.emotion = emotion
-                self.speak(f"hey {self.user}")
+                if self.emotion in ["happy", "sad", "angry"]:
+                    self.speak(f"hey {self.user}, you look {self.emotion}")
+                elif self.emotion == "fear":
+                    self.speak(f"hey {self.user}, you look feared")
+                else:
+                    self.speak(f"hey {self.user}")
             print("user : "+self.user+" || "+self.emotion)
 
     def sendEmail(self,reciever="firas.bouali11@gmail.com",message="hello world"):
