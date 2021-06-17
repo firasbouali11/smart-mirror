@@ -1,10 +1,14 @@
 import pickle
 import socket
 import struct
+import time
+
 from deepface import DeepFace
 import cv2
 import json
 deepface_model = DeepFace.build_model("VGG-Face")
+
+
 
 import base64
 import numpy as np
@@ -38,6 +42,7 @@ def camera(frame,i=1):
             try:
                 user = a.identity[0].split("/")[-2]
                 emotion = emotion["dominant_emotion"]
+                time.sleep(1)
                 conn.send((user+"/"+emotion).encode("utf-8"))
                 cv2.putText(frame, user, (x, y-70), cv2.FONT_HERSHEY_COMPLEX, 1, (255, 0, 0), 2)
                 cv2.putText(frame, emotion, (x, y-20), cv2.FONT_HERSHEY_COMPLEX, 1, (255, 0, 0), 2)
@@ -67,21 +72,26 @@ print("done")
 i = 1
 
 while True:
-    while len(data) < payload_size:
-        data += conn.recv(512)
-    packed_msg_size = data[:payload_size]
+    try:
+        while len(data) < payload_size:
+            data += conn.recv(1024 *4)
+        packed_msg_size = data[:payload_size]
 
-    data = data[payload_size:]
-    msg_size = struct.unpack("<L", packed_msg_size)[0]
+        data = data[payload_size:]
+        msg_size = struct.unpack("<L", packed_msg_size)[0]
 
-    while len(data) < msg_size:
-        data += conn.recv(512)
-    frame_data = data[:msg_size]
-    data = data[msg_size:]
+        while len(data) < msg_size:
+            data += conn.recv(1024 *4)
+        frame_data = data[:msg_size]
+        data = data[msg_size:]
+        frame = pickle.loads(frame_data)
+        camera(frame,i)
+        i+=1
 
-    frame = pickle.loads(frame_data)
-    camera(frame,i)
-    i+=1
+        cv2.imshow("frame", frame)
+        cv2.waitKey(1)
+    except Exception as e:
+        print(e)
+    except KeyboardInterrupt:
+        break
 
-    cv2.imshow("frame", frame)
-    cv2.waitKey(1)

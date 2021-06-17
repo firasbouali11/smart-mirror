@@ -21,6 +21,7 @@ import socket
 import struct
 import sys
 
+
 EMAIL = "santal.project10@gmail.com"
 PASSWORD  = "santal123456"
 
@@ -29,10 +30,9 @@ PASSWORD  = "santal123456"
 host = sys.argv[1]
 ENDPOINT = f"http://{host}:8000/"
 print(ENDPOINT)
-clientsocket=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-clientsocket.connect((host,9999))
 
-cap = cv2.VideoCapture(0)
+
+cap = cv2.VideoCapture(2)
 cap.set(cv2.CAP_PROP_FRAME_WIDTH, 320)
 cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 200)
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -48,6 +48,8 @@ class Alexa:
         print(self.users)
         self.user = ""
         self.emotion = ""
+        self.clientsocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.clientsocket.connect((host, 9999))
         self.speak(f"hey i'm {self.name}, how can i help you ?")
 
     def initModel(self):
@@ -99,7 +101,7 @@ class Alexa:
         r = sr.Recognizer()
         with sr.Microphone() as source:
             # r.adjust_for_ambient_noise(source)
-            print("listening ...")
+            print("listening")
             if listen:
                 audio = r.listen(source)
             else:
@@ -167,7 +169,7 @@ class Alexa:
             data = pickle.dumps(frame)
             message_size = struct.pack("<L", len(data))
 
-            clientsocket.send(message_size+data)
+            self.clientsocket.send(message_size+data)
 
     def cameraDone(self):
         cap.release()
@@ -175,21 +177,25 @@ class Alexa:
 
     def identify(self):
         while True:
-            user = clientsocket.recv(4096)
-            if not user:
-                print("no user !")
-                break
-            user, emotion = user.decode("utf-8").split("/")
-            if user != self.user:
-                self.user = user
-                self.emotion = emotion
-                if self.emotion in ["happy", "sad", "angry"]:
-                    self.speak(f"hey {self.user}, you look {self.emotion}")
-                elif self.emotion == "fear":
-                    self.speak(f"hey {self.user}, you look feared")
-                else:
-                    self.speak(f"hey {self.user}")
-            print("user : "+self.user+" || "+self.emotion)
+            try:
+                user = self.clientsocket.recv(4096)
+                if not user:
+                    print("no user !")
+                    continue
+                user, emotion = user.decode("utf-8").split("/")
+                if user != self.user:
+                    self.user = user
+                    self.emotion = emotion
+                    if self.emotion in ["happy", "sad", "angry"]:
+                        self.speak(f"hey {self.user}, you look {self.emotion}")
+                    elif self.emotion == "fear":
+                        self.speak(f"hey {self.user}, you look feared")
+                    else:
+                        self.speak(f"hey {self.user}")
+                print("user : "+self.user+" || "+self.emotion)
+            except Exception as e:
+                print(e)
+                continue
 
     def sendEmail(self,reciever="firas.bouali11@gmail.com",message="hello world"):
         server = smtplib.SMTP("smtp.gmail.com",587)

@@ -2,12 +2,35 @@ from Alexa.alexa import Alexa
 import threading
 from Utils.utils import formatDate
 
+
+user = ""
+emotion = ""
 def seeme(alexa):
     alexa.camera()
     alexa.cameraDone()
 
+
 def collector(alexa):
-    alexa.identify()
+    while True:
+            try:
+                user = alexa.clientsocket.recv(4096)
+                if not user:
+                    print("no user !")
+                user, emotion = user.decode("utf-8").split("/")
+                if user != alexa.user:
+                    alexa.user = user
+                    alexa.emotion = emotion
+                    # alexa.speak(f"hey {alexa.user}, you look {alexa.emotion}")
+                    if alexa.emotion in ["happy", "sad", "angry"]:
+                        alexa.speak(f"hey {alexa.user}, you look {alexa.emotion}")
+                    elif alexa.emotion == "fear":
+                        alexa.speak(f"hey {alexa.user}, you look feared")
+                    else:
+                        alexa.speak(f"hey {alexa.user}")
+                print("user : "+alexa.user+" || "+alexa.emotion)
+            except Exception as e:
+                print("identify error ",e)
+                continue
 
 
 def servant(alexa):
@@ -17,9 +40,9 @@ def servant(alexa):
         try:
             recon = alexa.recon()
         except:
-            print("error")
+            continue
         print(recon)
-        if alexa.name.lower() in recon.lower():
+        if alexa.name.lower() in recon.lower() or "eva" in recon.lower():
             tag, answer = alexa.response(recon)
             alexa.speak(answer)
             if tag == "music":
@@ -56,6 +79,7 @@ def servant(alexa):
                         alexa.sendTask("firas", alexa.user, taskname, x)
                     else:
                         alexa.showtasks(alexa.user)
+
             elif tag == "goodbye":
                 exit()
 
