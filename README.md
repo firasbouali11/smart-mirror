@@ -1,15 +1,11 @@
-# Smart Mirror
+# Smart Mirror Alexa
+## Overview
+The Smart Mirror Alexa project is designed to transform a standard mirror into an interactive smart mirror using a Raspberry Pi. This mirror not only provides reflection but also incorporates voice recognition, natural language processing (NLP), and face recognition to interact with users like a virtual assistant. Users can engage in verbal conversations with the mirror to perform tasks such as playing songs, scheduling appointments, checking the weather, and more.
 
-## Installation
-- a chrome or chromium browser is required
-- install the chromedriver compatible with your chrome browser version and place it inside the **Utils** directory
-- run the install script in **Instalation** folder
-- to let the mirror know you you have to add a folder inside **classifier/db** with your name and inside it 3 or 4 of your photos
-
-...
-
-## Usage
-**PS: the mirror software runs in a linux environment**
-- Usage: python Main.py
- 
-...
+## Features
+- Voice Interaction: Interact with the mirror using natural language voice commands.
+- Face Recognition: Identify signed-in users through camera-based face recognition.
+- Smart Assistant Integration: Utilize Alexa for a wide range of tasks, including music playback, weather updates, and scheduling appointments.
+- Color Customization: Change the color of the mirror using voice commands.
+- User Interface: the mirror shows through the glass a user interface that shows you your settings, music being played, appointments, etc...
+- Configuration App: Use an Alexa app to configure the mirror, add users, and manage appointments.
